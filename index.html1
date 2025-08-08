@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Học Tiếng Hoa</title>
+    <!-- Thư viện Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Cấu hình Tailwind cho màu sắc và font chữ -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .container-bg {
+            background-color: #e0f2fe; /* Light blue background */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <!-- Container chính của ứng dụng -->
+    <div class="container-bg w-full max-w-4xl mx-auto p-6 rounded-3xl shadow-2xl flex flex-col items-center space-y-8 md:flex-row md:space-y-0 md:space-x-8">
+
+        <!-- Sidebar / Menu -->
+        <div class="w-full md:w-1/3 bg-white p-6 rounded-2xl shadow-lg flex flex-col items-center space-y-4">
+            <h1 class="text-3xl font-bold text-gray-800">Học Tiếng Hoa</h1>
+            <p class="text-sm text-gray-500 text-center">Nền tảng học tập đơn giản và hiệu quả.</p>
+
+            <button onclick="showSection('vocabulary')" class="w-full py-3 px-4 bg-sky-500 hover:bg-sky-600 text-white font-medium rounded-xl shadow-md transition duration-300 transform hover:scale-105">
+                <i class="fas fa-list-ul mr-2"></i>Học từ vựng
+            </button>
+            <button onclick="showSection('phrases')" class="w-full py-3 px-4 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-xl shadow-md transition duration-300 transform hover:scale-105">
+                <i class="fas fa-comments mr-2"></i>Học mẫu câu
+            </button>
+            <button onclick="showSection('quiz')" class="w-full py-3 px-4 bg-indigo-500 hover:bg-indigo-600 text-white font-medium rounded-xl shadow-md transition duration-300 transform hover:scale-105">
+                <i class="fas fa-question-circle mr-2"></i>Kiểm tra kiến thức
+            </button>
+        </div>
+
+        <!-- Nội dung chính -->
+        <div id="content-area" class="w-full md:w-2/3 bg-white p-6 rounded-2xl shadow-lg flex-1">
+            
+            <!-- Phần giới thiệu -->
+            <div id="intro-section" class="section text-center">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Chào mừng bạn!</h2>
+                <p class="text-gray-600 text-lg mb-6">
+                    Hãy cùng khám phá thế giới của tiếng Hoa. Chọn một mục ở bên trái để bắt đầu học nhé!
+                </p>
+                <img src="https://placehold.co/600x400/bde0fe/000000?text=Chào+Mừng" alt="Chào mừng bạn đến với trang web học tiếng Hoa" class="rounded-lg shadow-md mx-auto">
+            </div>
+
+            <!-- Phần Từ vựng -->
+            <div id="vocabulary-section" class="section hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Học từ vựng</h2>
+                <div id="vocabulary-list" class="space-y-4">
+                    <!-- Nội dung từ vựng sẽ được chèn vào đây bởi JavaScript -->
+                </div>
+            </div>
+
+            <!-- Phần Mẫu câu -->
+            <div id="phrases-section" class="section hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Học mẫu câu</h2>
+                <div id="phrases-list" class="space-y-4">
+                    <!-- Nội dung mẫu câu sẽ được chèn vào đây bởi JavaScript -->
+                </div>
+            </div>
+
+            <!-- Phần Quiz -->
+            <div id="quiz-section" class="section hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Kiểm tra kiến thức</h2>
+                <div id="quiz-card" class="bg-gray-50 p-6 rounded-xl shadow-inner">
+                    <p id="quiz-question" class="text-xl font-medium text-gray-700 text-center mb-6"></p>
+                    <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Các lựa chọn sẽ được chèn vào đây -->
+                    </div>
+                    <div id="quiz-feedback" class="mt-4 text-center text-lg font-bold"></div>
+                    <button onclick="nextQuestion()" class="mt-6 w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition duration-300">Câu hỏi tiếp theo</button>
+                </div>
+            </div>
+
+            <!-- Hộp thông báo tùy chỉnh -->
+            <div id="message-box" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
+                <div class="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full text-center">
+                    <p id="message-text" class="text-xl font-semibold text-gray-800 mb-4"></p>
+                    <button onclick="hideMessageBox()" class="py-2 px-6 bg-sky-500 hover:bg-sky-600 text-white rounded-lg transition">Đóng</button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <script>
+        // Dữ liệu từ vựng và mẫu câu
+        const data = {
+            vocabulary: [
+                { hanzi: "你好", pinyin: "nǐ hǎo", meaning: "Xin chào" },
+                { hanzi: "谢谢", pinyin: "xiè xie", meaning: "Cảm ơn" },
+                { hanzi: "再见", pinyin: "zài jiàn", meaning: "Tạm biệt" },
+                { hanzi: "爱", pinyin: "ài", meaning: "Yêu" },
+                { hanzi: "学习", pinyin: "xué xí", meaning: "Học tập" },
+                { hanzi: "朋友", pinyin: "péng you", meaning: "Bạn bè" },
+                { hanzi: "老师", pinyin: "lǎo shī", meaning: "Giáo viên" },
+                { hanzi: "学生", pinyin: "xué sheng", meaning: "Học sinh" },
+            ],
+            phrases: [
+                { hanzi: "你好吗？", pinyin: "Nǐ hǎo ma?", meaning: "Bạn có khỏe không?" },
+                { hanzi: "我爱你。", pinyin: "Wǒ ài nǐ.", meaning: "Tôi yêu bạn." },
+                { hanzi: "请问，这是什么？", pinyin: "Qǐng wèn, zhè shì shén me?", meaning: "Xin hỏi, đây là cái gì?" },
+                { hanzi: "很高兴认识你。", pinyin: "Hěn gāo xìng rèn shí nǐ.", meaning: "Rất vui được làm quen với bạn." },
+                { hanzi: "你叫什么名字？", pinyin: "Nǐ jiào shén me míng zì?", meaning: "Bạn tên là gì?" },
+            ]
+        };
+
+        let currentQuizIndex = 0;
+        let quizData = [];
+        const sections = ['intro', 'vocabulary', 'phrases', 'quiz'];
+
+        // Lấy các phần tử DOM
+        const vocabularyList = document.getElementById('vocabulary-list');
+        const phrasesList = document.getElementById('phrases-list');
+        const quizQuestionEl = document.getElementById('quiz-question');
+        const quizOptionsEl = document.getElementById('quiz-options');
+        const quizFeedbackEl = document.getElementById('quiz-feedback');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+
+        // Hàm hiển thị hộp thông báo
+        function showMessageBox(message) {
+            messageText.textContent = message;
+            messageBox.classList.remove('hidden');
+        }
+
+        // Hàm ẩn hộp thông báo
+        function hideMessageBox() {
+            messageBox.classList.add('hidden');
+        }
+
+        // Hàm chuyển đổi giữa các phần nội dung
+        function showSection(sectionId) {
+            sections.forEach(id => {
+                const section = document.getElementById(`${id}-section`);
+                if (section) {
+                    section.classList.add('hidden');
+                }
+            });
+            const selectedSection = document.getElementById(`${sectionId}-section`);
+            if (selectedSection) {
+                selectedSection.classList.remove('hidden');
+            }
+
+            if (sectionId === 'quiz') {
+                prepareQuiz();
+            }
+        }
+
+        // Hàm phát âm từ/câu tiếng Hoa
+        function speak(text) {
+            if (!window.speechSynthesis) {
+                showMessageBox("Trình duyệt của bạn không hỗ trợ tính năng phát âm.");
+                return;
+            }
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-CN'; // Đặt ngôn ngữ là tiếng Trung
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Hàm tạo nội dung cho phần từ vựng
+        function renderVocabulary() {
+            vocabularyList.innerHTML = '';
+            data.vocabulary.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between';
+                card.innerHTML = `
+                    <div>
+                        <p class="text-xl font-bold text-sky-700">${item.hanzi}</p>
+                        <p class="text-base text-gray-500">${item.pinyin}</p>
+                        <p class="text-sm text-gray-800 mt-1">${item.meaning}</p>
+                    </div>
+                    <button onclick="speak('${item.hanzi}')" class="text-sky-500 hover:text-sky-700 transition">
+                        <i class="fas fa-volume-up text-2xl"></i>
+                    </button>
+                `;
+                vocabularyList.appendChild(card);
+            });
+        }
+
+        // Hàm tạo nội dung cho phần mẫu câu
+        function renderPhrases() {
+            phrasesList.innerHTML = '';
+            data.phrases.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-gray-50 p-4 rounded-xl shadow-sm flex items-center justify-between';
+                card.innerHTML = `
+                    <div>
+                        <p class="text-xl font-bold text-emerald-700">${item.hanzi}</p>
+                        <p class="text-base text-gray-500">${item.pinyin}</p>
+                        <p class="text-sm text-gray-800 mt-1">${item.meaning}</p>
+                    </div>
+                    <button onclick="speak('${item.hanzi}')" class="text-emerald-500 hover:text-emerald-700 transition">
+                        <i class="fas fa-volume-up text-2xl"></i>
+                    </button>
+                `;
+                phrasesList.appendChild(card);
+            });
+        }
+
+        // Hàm chuẩn bị dữ liệu cho quiz
+        function prepareQuiz() {
+            // Kết hợp từ vựng và mẫu câu để tạo câu hỏi
+            const allItems = [...data.vocabulary, ...data.phrases];
+            // Xáo trộn mảng câu hỏi
+            quizData = allItems.sort(() => Math.random() - 0.5);
+            currentQuizIndex = 0;
+            quizFeedbackEl.textContent = '';
+            nextQuestion();
+        }
+
+        // Hàm hiển thị câu hỏi tiếp theo
+        function nextQuestion() {
+            if (currentQuizIndex >= quizData.length) {
+                showMessageBox("Bạn đã hoàn thành tất cả các câu hỏi!");
+                currentQuizIndex = 0;
+                prepareQuiz(); // Bắt đầu lại quiz
+                return;
+            }
+
+            const currentItem = quizData[currentQuizIndex];
+            quizQuestionEl.textContent = currentItem.hanzi;
+            quizFeedbackEl.textContent = '';
+            quizOptionsEl.innerHTML = '';
+
+            // Tạo các lựa chọn
+            const options = getQuizOptions(currentItem.meaning);
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = 'py-3 px-4 bg-gray-200 hover:bg-gray-300 rounded-xl transition text-gray-700 font-medium';
+                button.onclick = () => checkAnswer(option, currentItem.meaning);
+                quizOptionsEl.appendChild(button);
+            });
+
+            currentQuizIndex++;
+        }
+
+        // Hàm tạo các lựa chọn đáp án (bao gồm 1 đáp án đúng và 3 đáp án sai)
+        function getQuizOptions(correctAnswer) {
+            const allMeanings = [...data.vocabulary.map(item => item.meaning), ...data.phrases.map(item => item.meaning)];
+            
+            // Lọc ra các đáp án sai
+            const incorrectOptions = allMeanings.filter(meaning => meaning !== correctAnswer);
+            
+            // Chọn ngẫu nhiên 3 đáp án sai
+            const shuffledIncorrect = incorrectOptions.sort(() => Math.random() - 0.5).slice(0, 3);
+            
+            // Kết hợp đáp án đúng và đáp án sai, sau đó xáo trộn
+            const options = [correctAnswer, ...shuffledIncorrect];
+            return options.sort(() => Math.random() - 0.5);
+        }
+
+        // Hàm kiểm tra đáp án
+        function checkAnswer(selectedOption, correctAnswer) {
+            if (selectedOption === correctAnswer) {
+                quizFeedbackEl.textContent = "Đúng rồi! 🎉";
+                quizFeedbackEl.className = 'mt-4 text-center text-lg font-bold text-green-600';
+            } else {
+                quizFeedbackEl.textContent = `Sai rồi. Đáp án đúng là: "${correctAnswer}"`;
+                quizFeedbackEl.className = 'mt-4 text-center text-lg font-bold text-red-600';
+            }
+        }
+
+        // Chạy các hàm khởi tạo khi trang tải
+        window.onload = function() {
+            renderVocabulary();
+            renderPhrases();
+            showSection('intro');
+        };
+    </script>
+</body>
+</html>
